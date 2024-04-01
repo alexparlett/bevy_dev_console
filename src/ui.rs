@@ -83,7 +83,7 @@ pub(crate) fn render_ui(
 
     egui::Area::new("Developer Console Area")
         .order(Order::Debug)
-        .anchor(Align2::RIGHT_TOP, Vec2::ZERO)
+        .anchor(Align2::RIGHT_TOP, egui::Vec2::ZERO)
         .show(contexts.ctx_mut(), |ui| {
             egui::Window::new("Developer Console")
                 .collapsible(false)

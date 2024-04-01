@@ -84,7 +84,8 @@ pub(crate) fn render_ui(
     egui::Window::new("Developer Console")
         .collapsible(false)
         .default_width(900.)
-        .order(egui::Order::Debug)
+        .order(egui::Order::DebuForegroundg)
+        .open(&mut state.open)
         .show(contexts.ctx_mut(), |ui| {
             // A General rule when creating layouts in egui is to place elements which fill remaining space last.
             // Since immediate mode ui can't predict the final sizes of widgets until they've already been drawn

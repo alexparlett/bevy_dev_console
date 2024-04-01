@@ -84,7 +84,7 @@ pub(crate) fn render_ui(
     egui::Window::new("Developer Console")
         .collapsible(false)
         .default_width(900.)
-        .order(egui::Order::DebuForegroundg)
+        .order(egui::Order::Foreground)
         .open(&mut state.open)
         .show(contexts.ctx_mut(), |ui| {
             // A General rule when creating layouts in egui is to place elements which fill remaining space last.

@@ -14,7 +14,7 @@ mod logging;
 pub mod prelude;
 pub mod ui;
 
-#[derive(Default, Resource)]
+#[derive(Resource)]
 pub struct DevConsoleConfig {
     pub enabled: bool
 }

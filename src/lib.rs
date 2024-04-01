@@ -5,6 +5,7 @@ use bevy_egui::EguiPlugin;
 use command::CommandHints;
 use config::ConsoleConfig;
 use ui::ConsoleUiState;
+use command::CommandHistory;
 
 #[cfg(feature = "builtin-parser")]
 pub mod builtin_parser;
@@ -46,6 +47,7 @@ impl Plugin for DevConsolePlugin {
         app.init_resource::<DevConsoleConfig>()
             .init_resource::<ConsoleUiState>()
             .init_resource::<CommandHints>()
+            .init_resource::<CommandHistory>()
             .init_resource::<ConsoleConfig>()
             .register_type::<ConsoleConfig>()
             .add_systems(

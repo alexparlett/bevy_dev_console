@@ -7,9 +7,10 @@ use bevy_egui::egui::text::LayoutJob;
 use bevy_egui::egui::{Stroke, TextFormat};
 use bevy_egui::*;
 use chrono::prelude::*;
+use ringbuffer::RingBuffer;
 use web_time::SystemTime;
 
-use crate::command::{CommandHints, ExecuteCommand};
+use crate::command::{CommandHints, CommandHistory, ExecuteCommand};
 use crate::config::ToColor32;
 use crate::logging::log_plugin::LogMessage;
 use crate::prelude::ConsoleConfig;
@@ -67,6 +68,8 @@ pub(crate) fn render_ui(
     key: Res<ButtonInput<KeyCode>>,
     mut hints: ResMut<CommandHints>,
     config: Res<ConsoleConfig>,
+    history: Res<CommandHistory>,
+    mut scroll_history: bevy::prelude::Local<i32>,
 ) {
     let mut submit_command = |command: &mut String| {
         if !command.trim().is_empty() {
@@ -76,10 +79,6 @@ pub(crate) fn render_ui(
             commands.add(ExecuteCommand(command));
         }
     };
-
-    if key.just_pressed(KeyCode::Enter) {
-        submit_command(&mut state.command);
-    }
 
     let mut open = true;
 
@@ -120,7 +119,59 @@ pub(crate) fn render_ui(
                             .font(config.theme.font.clone())
                             .lock_focus(true);
 
-                        ui.add(text_edit);
+                        let text_edit_interaction = ui.add(text_edit);
+
+                        if text_edit_interaction.lost_focus() && key.just_pressed(KeyCode::Enter) {
+                            submit_command(&mut state.command);
+                            *scroll_history = 0;
+                            ui.ctx().memory_mut(|mem| mem.request_focus(text_edit_id));
+                        }
+
+                        if text_edit_interaction.has_focus() {
+                            if key.just_pressed(KeyCode::ArrowUp) {
+                                let offset = *scroll_history + 1;
+                                let history_length = history.commands.len();
+
+                                if history_length > 0 && offset <= history_length as i32 {
+                                    let index = history_length - offset as usize;
+
+                                    match history.commands.get(index) {
+                                        None => {
+                                            state.command = String::new();
+                                            *scroll_history = offset;
+                                        }
+                                        Some(entry) => {
+                                            state.command = entry.clone();
+                                            *scroll_history = offset;
+                                        }
+                                    };
+                                }
+                            }
+
+
+                            if key.just_pressed(KeyCode::ArrowDown) {
+                                let offset = *scroll_history - 1;
+                                let history_length = history.commands.len();
+
+                                if offset >= 0 {
+                                    let index = history_length - offset as usize;
+
+                                    match history.commands.get(index) {
+                                        None => {
+                                            state.command = String::new();
+                                            *scroll_history = 0;
+                                        }
+                                        Some(entry) => {
+                                            state.command = entry.clone();
+                                            *scroll_history = offset;
+                                        }
+                                    };
+                                } else {
+                                    state.command = String::new();
+                                    *scroll_history = 0;
+                                }
+                            }
+                        }
 
                         // Each time we open the console, we want to set focus to the text edit control.
                         if !state.text_focus {

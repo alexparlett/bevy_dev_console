@@ -5,6 +5,7 @@ use std::ops::Range;
 
 use bevy::ecs::system::Command;
 use bevy::prelude::*;
+use ringbuffer::{AllocRingBuffer, RingBuffer};
 
 /// The command parser currently being used by the dev console.
 #[derive(Resource)]
@@ -139,6 +140,23 @@ impl Command for ExecuteCommand {
             world.insert_resource(parser);
         } else {
             error!("Default command parser doesn't exist, cannot execute command.");
+        }
+
+        world.resource_scope(|_, mut history: Mut<CommandHistory>| {
+            history.commands.push(self.0)
+        });
+    }
+}
+
+#[derive(Resource, Debug)]
+pub(crate) struct CommandHistory {
+    pub(crate) commands: AllocRingBuffer<String>,
+}
+
+impl Default for CommandHistory {
+    fn default() -> Self {
+        Self {
+            commands: AllocRingBuffer::new(50)
         }
     }
 }

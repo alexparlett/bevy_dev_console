@@ -14,6 +14,19 @@ mod logging;
 pub mod prelude;
 pub mod ui;
 
+#[derive(Default, Resource)]
+pub struct DevConsoleConfig {
+    pub enabled: bool
+}
+
+impl Default for DevConsoleConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true
+        }
+    }
+}
+
 /// Adds a Developer Console to your Bevy application.
 ///
 /// Requires [ConsoleLogPlugin](logging::log_plugin::ConsoleLogPlugin).
@@ -30,7 +43,8 @@ impl Plugin for DevConsolePlugin {
             app.init_resource::<command::DefaultCommandParser>();
         }
 
-        app.init_resource::<ConsoleUiState>()
+        app.init_resource::<DevConsoleConfig>()
+            .init_resource::<ConsoleUiState>()
             .init_resource::<CommandHints>()
             .init_resource::<ConsoleConfig>()
             .register_type::<ConsoleConfig>()
@@ -42,7 +56,8 @@ impl Plugin for DevConsolePlugin {
                         ui::open_close_ui,
                         ui::render_ui.run_if(|s: Res<ConsoleUiState>| s.open),
                     )
-                        .chain(),
+                        .chain()
+                        .run_if(|s: Res<DevConsoleConfig>| s.enabled),
                 ),
             );
     }

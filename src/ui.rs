@@ -4,7 +4,7 @@
 
 use bevy::prelude::*;
 use bevy_egui::egui::text::LayoutJob;
-use bevy_egui::egui::{Align2, Order, Stroke, TextFormat};
+use bevy_egui::egui::{Stroke, TextFormat};
 use bevy_egui::*;
 use chrono::prelude::*;
 use web_time::SystemTime;
@@ -81,9 +81,9 @@ pub(crate) fn render_ui(
         submit_command(&mut state.command);
     }
 
-    egui::Area::new("Developer Console")
-        .order(Order::Debug)
-        .anchor(Align2::RIGHT_TOP, egui::Vec2::ZERO)
+    egui::Window::new("Developer Console")
+        .collapsible(false)
+        .default_width(900.)
         .show(contexts.ctx_mut(), |ui| {
             // A General rule when creating layouts in egui is to place elements which fill remaining space last.
             // Since immediate mode ui can't predict the final sizes of widgets until they've already been drawn

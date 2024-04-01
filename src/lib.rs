@@ -51,7 +51,7 @@ impl Plugin for DevConsolePlugin {
             .add_systems(
                 Update,
                 (
-                    ui::read_logs,
+                    ui::read_logs.run_if(|s: Res<DevConsoleConfig>| s.enabled),
                     (
                         ui::open_close_ui,
                         ui::render_ui.run_if(|s: Res<ConsoleUiState>| s.open),

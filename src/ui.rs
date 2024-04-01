@@ -81,11 +81,13 @@ pub(crate) fn render_ui(
         submit_command(&mut state.command);
     }
 
+    let mut open = true;
+
     egui::Window::new("Developer Console")
         .collapsible(false)
         .default_width(900.)
         .order(egui::Order::Foreground)
-        .open(&mut state.open)
+        .open(&mut open)
         .show(contexts.ctx_mut(), |ui| {
             // A General rule when creating layouts in egui is to place elements which fill remaining space last.
             // Since immediate mode ui can't predict the final sizes of widgets until they've already been drawn
@@ -148,6 +150,10 @@ pub(crate) fn render_ui(
                     });
                 });
         });
+
+    if !open {
+        state.open = false;
+    }
 }
 
 fn add_log(
